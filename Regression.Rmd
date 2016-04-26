@@ -1,0 +1,104 @@
+---
+title: "Regression"
+author: "Anatoly Dryga"
+date: "2/17/2016"
+output: pdf_document
+---
+
+# lm() function For Regression
+
+Explanatory variable(s) is continuous.
+
+Assumptions:
+
+* errors are normally distributed
+
+* variances are constant
+
+* the explanatory variable is measured without error
+
+## Model
+$$y = a + b \cdot x $$
+
+# The simplest case
+```{r}
+x <- seq(1:100)
+y <- 4 + 2*x + 10*rnorm(length(x))
+plot(x, y)
+df <- as.data.frame(list(y=y, x=x))
+lin <- lm(y ~ x, df)
+abline(lin, col="red")
+summary(lin)
+```
+
+## Variance 
+
+Sum of squares can be partitioned:
+$$SST = SSR(regression) + SSE(residual)$$
+
+Total variance is explained by regression line and also has unexplained component.
+
+Model Evaluation:
+```{r}
+plot(lin)
+```
+
+but if model is non-linear:
+```{r}
+x <- seq(1:100)
+y <- 4 + 2*x + 0.1*x^2 + 10*rnorm(length(x))
+df <- as.data.frame(list(y=y, x=x))
+plot(x, y)
+lin <- lm(y ~ x, df)
+summary(lin)
+plot(lin)
+```
+
+Need to transform variables before model fitting.
+
+## R squared
+Sometimes there is too much scatter, we can quantify it 
+with coefficient of determination:
+$$ r^2 = \frac{SSR}{SST} $$
+
+```{r}
+x <- seq(1:100)
+y <- 4 + 2*x + 50*rnorm(length(x))
+plot(x, y)
+df <- as.data.frame(list(y=y, x=x))
+lin <- lm(y ~ x, df)
+summary(lin)
+plot(lin)
+```
+
+# Non-normality
+
+If errors are not normal
+```{r}
+x <- seq(1:100)
+y <- 4 + 2*x + 10*rchisq(length(x), df=4)
+plot(x, y)
+df <- as.data.frame(list(y=y, x=x))
+lin <- lm(y ~ x, df)
+summary(lin)
+plot(lin)
+```
+
+
+# What if Explanatory Variables are Dependent
+
+If variables are linearly dependent:
+
+```{r}
+x1 <- seq(1:100)
+x2 <- 10*x1
+y <- x1 + x2 + 3 + rnorm(length(x1))
+df <- as.data.frame(list(y=y, x1=x1, x2=x2))
+lin <- lm(y ~ x1 + x2, df)
+summary(lin)
+```
+
+How to find correlated variables:
+```{r}
+cor(df)
+```
